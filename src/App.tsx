@@ -13,6 +13,7 @@ import AdminOverview from "./pages/AdminOverview";
 import AdminProducts from "./pages/AdminProducts";
 import AdminOrders from "./pages/AdminOrders";
 import NotFound from "./pages/NotFound";
+import Checkout from "./pages/Checkout";
 
 const queryClient = new QueryClient();
 
@@ -28,6 +29,7 @@ const App = () => (
               <BrowserRouter>
                 <Routes>
                   <Route path="/" element={<Index />} />
+                  <Route path="/checkout" element={<Checkout />} />
                   <Route path="/admin" element={<AdminLayout />}>
                     <Route index element={<AdminOverview />} />
                     <Route path="products" element={<AdminProducts />} />
