@@ -1,18 +1,15 @@
 import { X, Minus, Plus, Sparkles } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import { motion, AnimatePresence } from "framer-motion";
-import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 
 const CartDrawer = () => {
-  const { items, isOpen, setIsOpen, removeFromCart, updateQuantity, totalPrice, clearCart } = useCart();
+  const { items, isOpen, setIsOpen, removeFromCart, updateQuantity, totalPrice } = useCart();
+  const navigate = useNavigate();
 
   const handleCheckout = () => {
-    toast.success("🎆 Order placed successfully! (Simulated Stripe Checkout)", {
-      description: `Total: ₹${totalPrice}`,
-      duration: 4000,
-    });
-    clearCart();
     setIsOpen(false);
+    navigate("/checkout");
   };
 
   return (
