@@ -23,6 +23,8 @@ const UPI_APPS = [
 ];
 
 const TIMER_SECONDS = 120; // 2 minutes
+const MERCHANT_UPI_ID = import.meta.env.VITE_UPI_ID ?? "barath200617@oksbi";
+const MERCHANT_NAME = import.meta.env.VITE_UPI_NAME ?? "DiwaliCrackers";
 
 const PaymentGateway = () => {
   const { items, totalPrice, clearCart } = useCart();
@@ -59,7 +61,9 @@ const PaymentGateway = () => {
     setExpired(false);
   };
 
-  const upiUri = `upi://pay?pa=merchant@upi&pn=DiwaliCrackers&am=${totalPrice}&cu=INR&tn=Order+Payment`;
+  const upiUri = `upi://pay?pa=${encodeURIComponent(MERCHANT_UPI_ID)}&pn=${encodeURIComponent(
+    MERCHANT_NAME
+  )}&am=${totalPrice}&cu=INR&tn=${encodeURIComponent("Order Payment")}`;
 
   const handleUPIPay = useCallback(
     (appId: string) => {
@@ -188,6 +192,9 @@ const PaymentGateway = () => {
                 Scan QR to Pay
               </h3>
             </div>
+            <p className="text-xs text-muted-foreground mb-4">
+              UPI ID: <strong>{MERCHANT_UPI_ID}</strong>
+            </p>
 
             <div className="flex flex-col items-center gap-4">
               <div
