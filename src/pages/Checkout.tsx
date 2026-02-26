@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useCart } from "@/contexts/CartContext";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { ArrowLeft, CreditCard } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import CartDrawer from "@/components/CartDrawer";
 import SparkleBackground from "@/components/SparkleBackground";
@@ -18,7 +18,7 @@ const Checkout = () => {
     city: "",
     pincode: "",
   });
-  const [processing, setProcessing] = useState(false);
+  
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
@@ -30,16 +30,7 @@ const Checkout = () => {
       toast.error("Please fill all fields");
       return;
     }
-    setProcessing(true);
-    setTimeout(() => {
-      toast.success("🎆 Payment successful! Order placed!", {
-        description: `Total: ₹${totalPrice}. Thank you, ${form.name}!`,
-        duration: 5000,
-      });
-      clearCart();
-      setProcessing(false);
-      navigate("/");
-    }, 2000);
+    navigate("/payment", { state: { customerDetails: form } });
   };
 
   if (items.length === 0) {
@@ -150,11 +141,9 @@ const Checkout = () => {
 
               <button
                 type="submit"
-                disabled={processing}
-                className="w-full mt-4 flex items-center justify-center gap-2 rounded-xl bg-primary py-3 text-base font-semibold text-primary-foreground hover:bg-primary/90 transition-colors disabled:opacity-60"
+                className="w-full mt-4 flex items-center justify-center gap-2 rounded-xl bg-primary py-3 text-base font-semibold text-primary-foreground hover:bg-primary/90 transition-colors"
               >
-                <CreditCard className="h-5 w-5" />
-                {processing ? "Processing Payment..." : `Pay ₹${totalPrice}`}
+                Proceed to Payment — ₹{totalPrice}
               </button>
             </form>
           </div>
