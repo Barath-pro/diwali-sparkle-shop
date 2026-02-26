@@ -18,5 +18,5 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
-  base: 'diwali-sparkle-shop',
+  // The base property has been removed from here!
 }));
