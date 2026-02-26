@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+﻿import { useState, useEffect, useCallback } from "react";
 import { useCart } from "@/contexts/CartContext";
 import { useNavigate, useLocation } from "react-router-dom";
 import { toast } from "sonner";
@@ -18,11 +18,17 @@ import SparkleBackground from "@/components/SparkleBackground";
 const UPI_APPS = [
   { id: "gpay", name: "Google Pay", color: "from-blue-500 to-blue-700", icon: "G" },
   { id: "phonepe", name: "PhonePe", color: "from-purple-500 to-purple-700", icon: "P" },
-  { id: "paytm", name: "Paytm", color: "from-sky-400 to-sky-600", icon: "₱" },
-  { id: "bhim", name: "BHIM UPI", color: "from-orange-500 to-orange-700", icon: "B" },
+  { id: "paytm", name: "Paytm", color: "from-sky-400 to-sky-600", icon: "P" },
+  { id: "select", name: "Select App", color: "from-amber-500 to-amber-700", icon: "S" },
 ];
 
-const TIMER_SECONDS = 120; // 2 minutes
+const UPI_PACKAGE_BY_APP: Record<string, string> = {
+  gpay: "com.google.android.apps.nbu.paisa.user",
+  phonepe: "com.phonepe.app",
+  paytm: "net.one97.paytm",
+};
+
+const TIMER_SECONDS = 120;
 const MERCHANT_UPI_ID = import.meta.env.VITE_UPI_ID ?? "barath200617@oksbi";
 const MERCHANT_NAME = import.meta.env.VITE_UPI_NAME ?? "DiwaliCrackers";
 
@@ -38,7 +44,6 @@ const PaymentGateway = () => {
 
   const customerDetails = (location.state as any)?.customerDetails;
 
-  // Countdown timer for QR
   useEffect(() => {
     if (isMobile || expired) return;
     if (timeLeft <= 0) {
@@ -61,33 +66,40 @@ const PaymentGateway = () => {
     setExpired(false);
   };
 
-  const upiUri = `upi://pay?pa=${encodeURIComponent(MERCHANT_UPI_ID)}&pn=${encodeURIComponent(
-    MERCHANT_NAME
-  )}&am=${totalPrice}&cu=INR&tn=${encodeURIComponent("Order Payment")}`;
+  const upiParams = new URLSearchParams({
+    pa: MERCHANT_UPI_ID,
+    pn: MERCHANT_NAME,
+    am: String(totalPrice),
+    cu: "INR",
+    tn: "Order Payment",
+  }).toString();
+
+  const upiUri = `upi://pay?${upiParams}`;
 
   const handleUPIPay = useCallback(
     (appId: string) => {
       setSelectedApp(appId);
       setProcessing(true);
-      // Simulate UPI payment
+
+      const packageName = UPI_PACKAGE_BY_APP[appId];
+      const targetUri = packageName
+        ? `intent://pay?${upiParams}#Intent;scheme=upi;package=${packageName};end`
+        : upiUri;
+
+      window.location.href = targetUri;
+
       setTimeout(() => {
-        toast.success("🎆 Payment successful! Order placed!", {
-          description: `₹${totalPrice} paid via ${UPI_APPS.find((a) => a.id === appId)?.name}. Thank you!`,
-          duration: 5000,
-        });
-        clearCart();
         setProcessing(false);
-        navigate("/");
-      }, 2500);
+      }, 1200);
     },
-    [totalPrice, clearCart, navigate]
+    [upiParams, upiUri]
   );
 
   const handleQRPaymentDone = () => {
     setProcessing(true);
     setTimeout(() => {
-      toast.success("🎆 Payment verified! Order placed!", {
-        description: `₹${totalPrice} received. Thank you${customerDetails?.name ? `, ${customerDetails.name}` : ""}!`,
+      toast.success("Payment verified! Order placed!", {
+        description: `Rs. ${totalPrice} received. Thank you${customerDetails?.name ? `, ${customerDetails.name}` : ""}!`,
         duration: 5000,
       });
       clearCart();
@@ -131,16 +143,14 @@ const PaymentGateway = () => {
           <ArrowLeft className="h-4 w-4" /> Back to Checkout
         </button>
 
-        {/* Amount Card */}
         <div className="rounded-xl border border-border bg-card p-6 text-center mb-6">
           <p className="text-sm text-muted-foreground mb-1">Amount to Pay</p>
           <h2 className="font-display text-4xl font-bold text-primary">
-            ₹{totalPrice}
+            Rs. {totalPrice}
           </h2>
         </div>
 
         {isMobile ? (
-          /* ─── MOBILE: UPI App Selection ─── */
           <div className="rounded-xl border border-border bg-card p-6">
             <div className="flex items-center gap-2 mb-5">
               <Smartphone className="h-5 w-5 text-primary" />
@@ -179,12 +189,11 @@ const PaymentGateway = () => {
 
             <div className="mt-5 text-center">
               <p className="text-xs text-muted-foreground">
-                Select an app to complete payment of ₹{totalPrice}
+                Tap an app to open it directly, or use Select App to choose any available UPI app.
               </p>
             </div>
           </div>
         ) : (
-          /* ─── DESKTOP: QR Code ─── */
           <div className="rounded-xl border border-border bg-card p-6">
             <div className="flex items-center gap-2 mb-5">
               <QrCode className="h-5 w-5 text-primary" />
@@ -212,7 +221,6 @@ const PaymentGateway = () => {
                 />
               </div>
 
-              {/* Timer */}
               <div
                 className={`flex items-center gap-2 text-sm font-medium ${
                   timeLeft <= 30
@@ -248,7 +256,7 @@ const PaymentGateway = () => {
 
               <p className="text-xs text-muted-foreground text-center mt-1">
                 Open any UPI app on your phone, scan the QR code, and complete
-                the payment of <strong>₹{totalPrice}</strong>
+                the payment of <strong>Rs. {totalPrice}</strong>
               </p>
             </div>
           </div>
