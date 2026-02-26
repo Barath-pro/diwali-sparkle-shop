@@ -3,6 +3,7 @@ import Hero from "@/components/Hero";
 import ProductGrid from "@/components/ProductGrid";
 import CartDrawer from "@/components/CartDrawer";
 import SparkleBackground from "@/components/SparkleBackground";
+import Footer from "@/components/Footer";
 
 const Index = () => {
   return (
@@ -12,9 +13,9 @@ const Index = () => {
       <Hero />
       <ProductGrid />
       <CartDrawer />
-      <footer className="relative z-10 border-t border-border py-8 text-center text-sm text-muted-foreground">
-        <p>© 2024 Diwali Crackers Store. Light up responsibly. 🪔</p>
-      </footer>
+      <div id="about"></div>
+      <div id="contact"></div>
+      <Footer />
     </div>
   );
 };
