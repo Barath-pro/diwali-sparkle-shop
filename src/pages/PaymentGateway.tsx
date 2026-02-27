@@ -10,6 +10,7 @@ import {
   QrCode,
   CheckCircle2,
   Timer,
+  MessageCircle,
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import CartDrawer from "@/components/CartDrawer";
@@ -31,6 +32,7 @@ const UPI_PACKAGE_BY_APP: Record<string, string> = {
 const TIMER_SECONDS = 120;
 const MERCHANT_UPI_ID = import.meta.env.VITE_UPI_ID ?? "barath200617@oksbi";
 const MERCHANT_NAME = import.meta.env.VITE_UPI_NAME ?? "DiwaliCrackers";
+const WHATSAPP_NUMBER = import.meta.env.VITE_WHATSAPP_NUMBER ?? "+919944587872";
 
 const PaymentGateway = () => {
   const { items, totalPrice, clearCart } = useCart();
@@ -106,6 +108,38 @@ const PaymentGateway = () => {
       setProcessing(false);
       navigate("/");
     }, 2000);
+  };
+
+  const handleWhatsAppContact = () => {
+    const safePhone = WHATSAPP_NUMBER.replace(/\D/g, "");
+    const productLines = items
+      .map((item, index) => {
+        const lineTotal = item.product.price * item.quantity;
+        return `${index + 1}. ${item.product.title} x ${item.quantity} = Rs. ${lineTotal}`;
+      })
+      .join("\n");
+
+    const customerLines = [
+      `Name: ${customerDetails?.name || "N/A"}`,
+      `Phone: ${customerDetails?.phone || "N/A"}`,
+      `Email: ${customerDetails?.email || "N/A"}`,
+      `Address: ${customerDetails?.address || "N/A"}`,
+      `City: ${customerDetails?.city || "N/A"}`,
+      `Pincode: ${customerDetails?.pincode || "N/A"}`,
+    ].join("\n");
+
+    const message = `Hi, I need help with payment for my order.
+
+Customer Details:
+${customerLines}
+
+Order Details:
+${productLines}
+
+Total Amount: Rs. ${totalPrice}`;
+
+    const whatsappUrl = `https://wa.me/${safePhone}?text=${encodeURIComponent(message)}`;
+    window.open(whatsappUrl, "_blank", "noopener,noreferrer");
   };
 
   if (items.length === 0) {
@@ -191,6 +225,13 @@ const PaymentGateway = () => {
               <p className="text-xs text-muted-foreground">
                 Tap an app to open it directly, or use Select App to choose any available UPI app.
               </p>
+              <button
+                onClick={handleWhatsAppContact}
+                className="mt-4 inline-flex items-center gap-2 rounded-xl bg-green-600 px-4 py-2 text-sm font-semibold text-white hover:bg-green-700 transition-colors"
+              >
+                <MessageCircle className="h-4 w-4" />
+                Contact Us on WhatsApp
+              </button>
             </div>
           </div>
         ) : (
@@ -258,6 +299,13 @@ const PaymentGateway = () => {
                 Open any UPI app on your phone, scan the QR code, and complete
                 the payment of <strong>Rs. {totalPrice}</strong>
               </p>
+              <button
+                onClick={handleWhatsAppContact}
+                className="inline-flex items-center gap-2 rounded-xl bg-green-600 px-4 py-2 text-sm font-semibold text-white hover:bg-green-700 transition-colors"
+              >
+                <MessageCircle className="h-4 w-4" />
+                Need help? Chat on WhatsApp
+              </button>
             </div>
           </div>
         )}
