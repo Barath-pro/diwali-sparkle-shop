@@ -1,4 +1,4 @@
-import { BarChart3, Package, ShoppingBag, LogOut, Sparkles } from "lucide-react";
+import { BarChart3, Package, ShoppingBag, LogOut } from "lucide-react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -22,8 +22,8 @@ const AdminSidebar = () => {
     <aside className="w-64 border-r border-border bg-card min-h-screen flex flex-col">
       <div className="p-6 border-b border-border">
         <Link to="/" className="flex items-center gap-2">
-          <Sparkles className="h-5 w-5 text-primary" />
-          <span className="font-display text-lg font-bold text-foreground">Admin Panel</span>
+          <img src="/Logo%20file.png" alt="Festive Kart logo" className="h-8 w-auto object-contain" />
+          <span className="font-display text-sm font-semibold text-foreground">Admin Panel</span>
         </Link>
       </div>
       <nav className="flex-1 p-4 space-y-1">

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useCallback, useContext, useState } from "react";
 
 export interface Order {
   id: string;
@@ -20,6 +20,7 @@ const mockOrders: Order[] = [
 
 interface OrderContextType {
   orders: Order[];
+  addOrder: (order: Omit<Order, "id" | "status" | "date"> & { status?: Order["status"]; date?: string }) => void;
   updateOrderStatus: (id: string, status: Order["status"]) => void;
 }
 
@@ -34,12 +35,30 @@ export const useOrders = () => {
 export const OrderProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [orders, setOrders] = useState<Order[]>(mockOrders);
 
-  const updateOrderStatus = (id: string, status: Order["status"]) => {
+  const addOrder = useCallback((order: Omit<Order, "id" | "status" | "date"> & { status?: Order["status"]; date?: string }) => {
+    setOrders(prev => {
+      const maxOrderNo = prev.reduce((max, current) => {
+        const n = Number(current.id.replace("ORD-", ""));
+        return Number.isFinite(n) ? Math.max(max, n) : max;
+      }, 0);
+
+      const nextId = `ORD-${String(maxOrderNo + 1).padStart(3, "0")}`;
+      const nextOrder: Order = {
+        ...order,
+        id: nextId,
+        status: order.status ?? "Pending",
+        date: order.date ?? new Date().toISOString().slice(0, 10),
+      };
+      return [...prev, nextOrder];
+    });
+  }, []);
+
+  const updateOrderStatus = useCallback((id: string, status: Order["status"]) => {
     setOrders(prev => prev.map(o => o.id === id ? { ...o, status } : o));
-  };
+  }, []);
 
   return (
-    <OrderContext.Provider value={{ orders, updateOrderStatus }}>
+    <OrderContext.Provider value={{ orders, addOrder, updateOrderStatus }}>
       {children}
     </OrderContext.Provider>
   );

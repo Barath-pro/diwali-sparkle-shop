@@ -1,4 +1,4 @@
-import { ShoppingCart, Sparkles, User, LogOut } from "lucide-react";
+import { ShoppingCart, User, LogOut } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { Link, useNavigate } from "react-router-dom";
@@ -16,9 +16,9 @@ const Navbar = () => {
       <nav className="sticky top-0 z-50 border-b border-border bg-card/80 backdrop-blur-md">
         <div className="container mx-auto flex h-16 items-center justify-between px-4">
           <Link to="/" className="flex items-center gap-2">
-            <Sparkles className="h-6 w-6 text-primary" />
-            <span className="font-display text-xl font-bold text-foreground">
-              Diwali <span className="text-primary">Crackers</span>
+            <img src="/logo-cropped.png" alt="Festive Kart logo" className="h-10 md:h-12 w-auto object-contain" />
+            <span className="text-lg md:text-xl font-bold text-foreground">
+              Festive<span className="text-primary">Kart</span>
             </span>
           </Link>
 

@@ -13,21 +13,41 @@ const AdminProducts = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editing, setEditing] = useState<Product | null>(null);
   const [form, setForm] = useState({ title: "", price: "", image: "", category: "" });
+  const [selectedFileName, setSelectedFileName] = useState("");
 
   const openAdd = () => {
     setEditing(null);
     setForm({ title: "", price: "", image: "", category: "" });
+    setSelectedFileName("");
     setDialogOpen(true);
   };
 
   const openEdit = (p: Product) => {
     setEditing(p);
     setForm({ title: p.title, price: p.price.toString(), image: p.image, category: p.category });
+    setSelectedFileName("");
     setDialogOpen(true);
+  };
+
+  const handleImageFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setSelectedFileName(file.name);
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result === "string") {
+        setForm(f => ({ ...f, image: reader.result }));
+      }
+    };
+    reader.readAsDataURL(file);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!form.image) {
+      toast.error("Please upload a product image");
+      return;
+    }
     const data = { title: form.title, price: Number(form.price), image: form.image, category: form.category, description: "" };
     if (editing) {
       updateProduct(editing.id, data);
@@ -103,8 +123,12 @@ const AdminProducts = () => {
               <Input type="number" value={form.price} onChange={e => setForm(f => ({ ...f, price: e.target.value }))} required />
             </div>
             <div className="space-y-2">
-              <Label>Image URL</Label>
-              <Input value={form.image} onChange={e => setForm(f => ({ ...f, image: e.target.value }))} required />
+              <Label>Upload Image</Label>
+              <Input type="file" accept="image/*" onChange={handleImageFileChange} />
+              {selectedFileName && <p className="text-xs text-muted-foreground">Selected: {selectedFileName}</p>}
+              {form.image && (
+                <img src={form.image} alt="Preview" className="h-16 w-16 rounded-md object-cover border border-border" />
+              )}
             </div>
             <div className="space-y-2">
               <Label>Category</Label>

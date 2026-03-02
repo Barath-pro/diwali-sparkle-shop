@@ -3,6 +3,7 @@ import { useCart } from "@/contexts/CartContext";
 import { useNavigate, useLocation } from "react-router-dom";
 import { toast } from "sonner";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useOrders } from "@/contexts/OrderContext";
 import { QRCodeSVG } from "qrcode.react";
 import {
   ArrowLeft,
@@ -36,6 +37,7 @@ const WHATSAPP_NUMBER = import.meta.env.VITE_WHATSAPP_NUMBER ?? "+919944587872";
 
 const PaymentGateway = () => {
   const { items, totalPrice, clearCart } = useCart();
+  const { addOrder } = useOrders();
   const navigate = useNavigate();
   const location = useLocation();
   const isMobile = useIsMobile();
@@ -100,6 +102,16 @@ const PaymentGateway = () => {
   const handleQRPaymentDone = () => {
     setProcessing(true);
     setTimeout(() => {
+      addOrder({
+        customerName: customerDetails?.name || "Guest Customer",
+        email: customerDetails?.email || "guest@example.com",
+        items: items.map(item => ({
+          title: item.product.title,
+          quantity: item.quantity,
+          price: item.product.price,
+        })),
+        total: totalPrice,
+      });
       toast.success("Payment verified! Order placed!", {
         description: `Rs. ${totalPrice} received. Thank you${customerDetails?.name ? `, ${customerDetails.name}` : ""}!`,
         duration: 5000,
